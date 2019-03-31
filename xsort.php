@@ -10,20 +10,25 @@
 
   $log_level = Logger::INFO;
 
-  function get_vsi($in_v) {
+  function sort_veh($a, $b) {
     global $wzorce;
-    $fna = $in_v->getAttribute('filename');
-    $fid = (int) $in_v->getAttribute('id');
+    $fna = $a->getAttribute('filename');
+    $fnb = $b->getAttribute('filename');
+    $fia = (int) $a->getAttribute('id');
+    $fib = (int) $b->getAttribute('id');
     foreach ($wzorce as $klucz => $wzor) {
       if (preg_match('/' . $wzor . '/i', $fna)) {
-        return $klucz;
+        if (preg_match('/' . $wzor . '/i', $fnb)) {
+          // obydwa pasują do tego samego wzorca
+          break;
+        } else {
+          return -1;
+        }
+      } elseif (preg_match('/' . $wzor . '/i', $fnb)) {
+        return 1;
       }
     }
-    return 100 + $fid;
-  }
-
-  function sort_veh($a, $b) {
-    return (int) get_vsi($a) - get_vsi($b);
+    return $fia - $fib;
   }
 
   function pat_line_is_ok($fline) {
