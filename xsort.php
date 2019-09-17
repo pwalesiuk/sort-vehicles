@@ -8,7 +8,7 @@
   use Monolog\Logger;
   use Monolog\Handler\StreamHandler;
 
-  $log_level = Logger::INFO;
+  $log_level = Logger::DEBUG;
 
   function sort_veh($a, $b) {
     global $wzorce;
@@ -34,6 +34,11 @@
   function pat_line_is_ok($fline) {
     if (strlen(trim($fline)) < 3 || $fline[0] == '#' || $fline[0] == ';') return false;
     return true;
+  }
+
+  function daj_file_name(&$item1, $key)
+  {
+    $item1 = basename($item1, '.xml');
   }
 
   $options = getopt('f:');
@@ -97,7 +102,18 @@
   sort($all_name);
   $logger->addDebug('saving all names', array('all_name.txt'));
   file_put_contents($out_dir . 'all_name.txt', implode(PHP_EOL, $all_name));
-  
+
+  $uniq_names = $all_name;
+  array_walk($uniq_names, 'daj_file_name');
+  $uniq_names = array_unique($uniq_names);
+  sort($uniq_names);
+  $logger->addDebug('saving pojazdy', array('pojazdy.txt'));
+  file_put_contents($out_dir . 'pojazdy.txt', implode(PHP_EOL, $uniq_names));
+  $nowe = array();
+  foreach($uniq_names as $nowy) {
+    if (!in_array($nowy, $wzorce)) $nowe[] = $nowy;
+  }
+
   $xp = new DOMXPath($dom);
   $xveh = $xp->query('/vehicles/vehicle');
   $vehicles = iterator_to_array($xveh);
@@ -128,6 +144,10 @@
   $logger->addDebug('saving new file', array('new.xml'));
   file_put_contents($afile, $newdoc->saveXML());
 
+  if (count($nowe) > 0) {
+    $logger->addDebug('nowe wzorce', array('nowe.txt'));
+    file_put_contents($out_dir . 'nowe.txt', implode(PHP_EOL, $nowe));
+  }
 
   $logger->addInfo('stop');
   
