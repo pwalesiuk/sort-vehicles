@@ -16,6 +16,9 @@
     $fnb = $b->getAttribute('filename');
     $fia = (int) $a->getAttribute('id');
     $fib = (int) $b->getAttribute('id');
+    // pojazdy bez podrzędnego znacznika drivable trafiają na koniec 
+    $pom = $b->getElementsByTagName('drivable')->length - $a->getElementsByTagName('drivable')->length;
+    if ($pom <> 0) return $pom;
     foreach ($wzorce as $klucz => $wzor) {
       if (preg_match('/' . $wzor . '/i', $fna)) {
         if (preg_match('/' . $wzor . '/i', $fnb)) {
@@ -92,7 +95,7 @@
   $logger->addInfo('wczytane wzorce', $wzorce);
 
   $xp = new DOMXPath($dom);
-  $m = iterator_to_array($xp->query('vehicle/@filename'));
+  $m = iterator_to_array($xp->query('vehicle[drivable]/@filename'));
   foreach ($m as $elem) {
     $sn = (string) $elem->value;
     if ($sn) {
