@@ -20,14 +20,15 @@
     $pom = $b->getElementsByTagName('drivable')->length - $a->getElementsByTagName('drivable')->length;
     if ($pom <> 0) return $pom;
     foreach ($wzorce as $klucz => $wzor) {
-      if (preg_match('/' . $wzor . '/i', $fna)) {
-        if (preg_match('/' . $wzor . '/i', $fnb)) {
+      $pwz = '/^' . $wzor . '$/i';
+      if (preg_match($pwz, $fna)) {
+        if (preg_match($pwz, $fnb)) {
           // obydwa pasują do tego samego wzorca
           break;
         } else {
           return -1;
         }
-      } elseif (preg_match('/' . $wzor . '/i', $fnb)) {
+      } elseif (preg_match($pwz, $fnb)) {
         return 1;
       }
     }
@@ -124,6 +125,8 @@
   usort($vehicles, 'sort_veh');
 
   $newdoc = new DOMDocument('1.0', 'UTF-8');
+  $newdoc->preserveWhiteSpace = false;
+  $newdoc->formatOutput = true;  
   $libraries = $newdoc->appendChild($newdoc->importNode($dom->documentElement));
   $ind = 0;
   $zmiany = array();
