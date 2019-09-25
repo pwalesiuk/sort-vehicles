@@ -12,8 +12,8 @@
 
   function sort_veh($a, $b) {
     global $wzorce;
-    $fna = $a->getAttribute('filename');
-    $fnb = $b->getAttribute('filename');
+    $fna = basename($a->getAttribute('filename'), '.xml');
+    $fnb = basename($b->getAttribute('filename'), '.xml');
     $fia = (int) $a->getAttribute('id');
     $fib = (int) $b->getAttribute('id');
     // pojazdy bez podrzędnego znacznika drivable trafiają na koniec 
@@ -129,13 +129,14 @@
   $newdoc->formatOutput = true;  
   $libraries = $newdoc->appendChild($newdoc->importNode($dom->documentElement));
   $ind = 0;
+  $poz = 0;
   $zmiany = array();
   foreach ($vehicles as $veh) {
     $org_id = $veh->getAttribute('id');
     // na razie nie zmieniamy numeracji
     $ind = $org_id;
     $veh->setAttribute('id', $ind);
-    $zmiany[] = sprintf('%s [%d] => %d', $veh->getAttribute('filename'), $org_id, $veh->getAttribute('id'));
+    $zmiany[] = sprintf('%s [%d] => %d', $veh->getAttribute('filename'), $org_id, ++$poz);
     $libraries->appendChild($newdoc->importNode($veh, true));
   }
   $logger->addDebug('saving zmiany', array('zmiany.txt'));
